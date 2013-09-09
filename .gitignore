@@ -1,0 +1,13 @@
+.DS_Store
+.cache
+.target
+.classpath
+.project
+.history
+.lib
+.settings
+.scala_dependencies
+.worksheet
+target/
+*.swp
+tags
