@@ -40,11 +40,14 @@ object VectDemo { outer =>
     }
 
     implicit class VectOps[A, M <: Nat](xs: Vect[A, M]) {
-      def ++[N <: Nat](ys: Vect[A, N])(implicit concat: VConcat[A, Vect[A, M], Vect[A, N]]): concat.Out = concat(xs, ys)
+      def ++[N <: Nat](ys: Vect[A, N])
+        (implicit concat: VConcat[A, Vect[A, M], Vect[A, N]]): concat.Out = concat(xs, ys)
       
-      def vAdd(ys: Vect[A, M])(implicit add: VAdd[A, M]): Vect[A, M] = add(xs, ys)
+      def vAdd(ys: Vect[A, M])
+        (implicit add: VAdd[A, M]): Vect[A, M] = add(xs, ys)
 
-      def zipWith[B, C](ys: Vect[B, M])(f: (A, B) => C)(implicit zip: VZipWith[A, B, C, M]): Vect[C, M] = zip(xs, ys, f)
+      def zipWith[B, C](ys: Vect[B, M])(f: (A, B) => C)
+        (implicit zip: VZipWith[A, B, C, M]): Vect[C, M] = zip(xs, ys, f)
     }
   }
 
@@ -63,11 +66,12 @@ object VectDemo { outer =>
     }
 
     // Induction case for :#:
-    implicit def vconsConcat[A, M <: Nat, N <: Nat](implicit ctail: VConcat[A, Vect[A, M], Vect[A, N]]) =
-      new VConcat[A, Vect[A, Succ[M]], Vect[A, N]] {
-        type MN = Succ[ctail.MN]
-        def apply(xs: Vect[A, Succ[M]], ys: Vect[A, N]): Out = xs.head :#: (xs.tail ++ ys)
-      }
+    implicit def vconsConcat[A, M <: Nat, N <: Nat]
+      (implicit ctail: VConcat[A, Vect[A, M], Vect[A, N]]) =
+        new VConcat[A, Vect[A, Succ[M]], Vect[A, N]] {
+          type MN = Succ[ctail.MN]
+          def apply(xs: Vect[A, Succ[M]], ys: Vect[A, N]): Out = xs.head :#: (xs.tail ++ ys)
+        }
   }
 
   // Signature for Vect addition
@@ -82,9 +86,11 @@ object VectDemo { outer =>
     }
 
     // Induction case for :#:
-    implicit def vconsAdd[A: Numeric, N <: Nat](implicit atail: VAdd[A, N]) = new VAdd[A, Succ[N]] {
-      def apply(xs: Vect[A, Succ[N]], ys: Vect[A, Succ[N]]): Vect[A, Succ[N]] = (xs.head+ys.head) :#: (xs.tail vAdd ys.tail)
-    }
+    implicit def vconsAdd[A: Numeric, N <: Nat]
+      (implicit atail: VAdd[A, N]) = new VAdd[A, Succ[N]] {
+        def apply(xs: Vect[A, Succ[N]], ys: Vect[A, Succ[N]]): Vect[A, Succ[N]] =
+          (xs.head+ys.head) :#: (xs.tail vAdd ys.tail)
+      }
   }
 
   // Signature for Vect zipWith
@@ -99,10 +105,11 @@ object VectDemo { outer =>
     }
 
     // Induction case for :#:
-    implicit def vconsZipWith[A, B, C, N <: Nat](implicit ztail: VZipWith[A, B, C, N]) = new VZipWith[A, B, C, Succ[N]] {
-      def apply(xs: Vect[A, Succ[N]], ys: Vect[B, Succ[N]], f: (A, B) => C): Vect[C, Succ[N]] =
-        f(xs.head, ys.head) :#: (xs.tail zipWith ys.tail)(f)
-    }
+    implicit def vconsZipWith[A, B, C, N <: Nat]
+      (implicit ztail: VZipWith[A, B, C, N]) = new VZipWith[A, B, C, Succ[N]] {
+        def apply(xs: Vect[A, Succ[N]], ys: Vect[B, Succ[N]], f: (A, B) => C): Vect[C, Succ[N]] =
+          f(xs.head, ys.head) :#: (xs.tail zipWith ys.tail)(f)
+      }
   }
 
   val l1 = 1 :#: 2 :#: 3 :#: VNil
