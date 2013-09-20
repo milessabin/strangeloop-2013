@@ -22,6 +22,13 @@ import shapeless._, ops.hlist._, tag._
 import scalaz.Applicative
 import scalaz.syntax.applicative._
 
+/*
+ * Partial translation to Scala of the Idris effect DSL desribed by Edwin Brady in 
+ * "Programming and Reasoning with Algebraic Effects and Dependent Types", to be
+ * presented at ICFP 2013,
+ *
+ * http://edwinb.wordpress.com/2013/03/28/programming-and-reasoning-with-algebraic-effects-and-dependent-types/
+ */
 object EffDemo extends App {
   def typed[T](t: => T) {}
 
@@ -148,6 +155,8 @@ object EffDemo extends App {
   trait Tag
   trait Count
 
+  // In Scala we need to sprinkle this type annoation around in
+  // places where the Idris compiler would be able to infer it.
   type RES = CState[Int @@ Tag] :: CState[Int @@ Count] :: HNil
 
   def tagCount[M[_], T](t: Tree[T]): EffM[M, RES, RES, Tree[(Int, T)]] = {
