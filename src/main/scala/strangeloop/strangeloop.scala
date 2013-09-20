@@ -40,7 +40,7 @@ object VectDemo extends App { outer =>
     }
 
     implicit class VectOps[A, M <: Nat](xs: Vect[A, M]) {
-      def ++[N <: Nat](ys: Vect[A, N])(implicit prepend: VPrepend[A, Vect[A, M], Vect[A, N]]): prepend.Out = prepend(xs, ys)
+      def ++[N <: Nat](ys: Vect[A, N])(implicit concat: VConcat[A, Vect[A, M], Vect[A, N]]): concat.Out = concat(xs, ys)
       
       def vAdd(ys: Vect[A, M])(implicit add: VAdd[A, M]): Vect[A, M] = add(xs, ys)
 
@@ -48,21 +48,21 @@ object VectDemo extends App { outer =>
     }
   }
 
-  trait VPrepend[A, XS, YS] {
+  trait VConcat[A, XS, YS] {
     type MN <: Nat
     type Out = Vect[A, MN]
     def apply(xs: XS, ys: YS): Out
   }
 
-  object VPrepend {
-    implicit def vnilPrepend[A, N <: Nat] = new VPrepend[A, Vect[A, _0], Vect[A, N]] {
+  object VConcat {
+    implicit def vnilConcat[A, N <: Nat] = new VConcat[A, Vect[A, _0], Vect[A, N]] {
       type MN = N
       def apply(xs: Vect[A, _0], ys: Vect[A, N]): Out = ys
     }
 
-    implicit def vconsPrepend[A, M <: Nat, N <: Nat](implicit ptail: VPrepend[A, Vect[A, M], Vect[A, N]]) =
-      new VPrepend[A, Vect[A, Succ[M]], Vect[A, N]] {
-        type MN = Succ[ptail.MN]
+    implicit def vconsConcat[A, M <: Nat, N <: Nat](implicit ctail: VConcat[A, Vect[A, M], Vect[A, N]]) =
+      new VConcat[A, Vect[A, Succ[M]], Vect[A, N]] {
+        type MN = Succ[ctail.MN]
         def apply(xs: Vect[A, Succ[M]], ys: Vect[A, N]): Out = xs.head :#: (xs.tail ++ ys)
       }
   }
