@@ -48,18 +48,21 @@ object VectDemo extends App { outer =>
     }
   }
 
+  // Signature for Vect concatenation
   trait VConcat[A, XS, YS] {
-    type MN <: Nat
+    type MN <: Nat           // Type level size is computed
     type Out = Vect[A, MN]
     def apply(xs: XS, ys: YS): Out
   }
 
   object VConcat {
+    // Base case for VNil
     implicit def vnilConcat[A, N <: Nat] = new VConcat[A, Vect[A, _0], Vect[A, N]] {
       type MN = N
       def apply(xs: Vect[A, _0], ys: Vect[A, N]): Out = ys
     }
 
+    // Induction case for :#:
     implicit def vconsConcat[A, M <: Nat, N <: Nat](implicit ctail: VConcat[A, Vect[A, M], Vect[A, N]]) =
       new VConcat[A, Vect[A, Succ[M]], Vect[A, N]] {
         type MN = Succ[ctail.MN]
@@ -67,29 +70,35 @@ object VectDemo extends App { outer =>
       }
   }
 
+  // Signature for Vect addition
   trait VAdd[A, N <: Nat] {
     def apply(xs: Vect[A, N], ys: Vect[A, N]): Vect[A, N]
   }
 
   object VAdd {
+    // Base case for VNil
     implicit def vnilAdd[A: Numeric] = new VAdd[A, _0] {
       def apply(xs: Vect[A, _0], ys: Vect[A, _0]): Vect[A, _0] = VNil
     }
 
+    // Induction case for :#:
     implicit def vconsAdd[A: Numeric, N <: Nat](implicit atail: VAdd[A, N]) = new VAdd[A, Succ[N]] {
       def apply(xs: Vect[A, Succ[N]], ys: Vect[A, Succ[N]]): Vect[A, Succ[N]] = (xs.head+ys.head) :#: (xs.tail vAdd ys.tail)
     }
   }
 
+  // Signature for Vect zipWith
   trait VZipWith[A, B, C, N <: Nat] {
     def apply(xs: Vect[A, N], ys: Vect[B, N], f: (A, B) => C): Vect[C, N]
   }
 
   object VZipWith {
+    // Base case for VNil
     implicit def vnilZipWith[A, B, C] = new VZipWith[A, B, C, _0] {
       def apply(xs: Vect[A, _0], ys: Vect[B, _0], f: (A, B) => C): Vect[C, _0] = VNil
     }
 
+    // Induction case for :#:
     implicit def vconsZipWith[A, B, C, N <: Nat](implicit ztail: VZipWith[A, B, C, N]) = new VZipWith[A, B, C, Succ[N]] {
       def apply(xs: Vect[A, Succ[N]], ys: Vect[B, Succ[N]], f: (A, B) => C): Vect[C, Succ[N]] =
         f(xs.head, ys.head) :#: (xs.tail zipWith ys.tail)(f)
