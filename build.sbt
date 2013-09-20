@@ -16,4 +16,4 @@ libraryDependencies ++= Seq(
 //scalacOptions ++= Seq("-feature", "-Xlog-implicits")
 scalacOptions ++= Seq("-feature")
 
-initialCommands in console := "import shapeless._"
+initialCommands in console := "import shapeless._, strangeloop._"

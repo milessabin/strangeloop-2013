@@ -22,7 +22,7 @@ import scala.Numeric.Implicits._
 
 import shapeless._, nat._, test.illTyped
 
-object VectDemo extends App { outer =>
+object VectDemo { outer =>
   def typed[T](t: => T) {}
 
   sealed trait Vect[+A, N <: Nat] { xs =>
